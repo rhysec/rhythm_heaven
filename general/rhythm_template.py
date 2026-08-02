@@ -24,12 +24,41 @@ class Game:
         self.current_beat = 0
         self.previous_beat = -1
         self.elapsed_time = 0
+        self.map_index = 0
+
+    # level map
+        self.level_map = [
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+            0, 0, 0, 0,   0, 0, 0, 0,
+
+
+
+
+
+
+
+
+
+
+
+        ]
 
     def import_assets(self):
         self.assets = {}
 
-        self.audio = { 'music' : load_music_stream('C:/Users/rhyse/PycharmProjects/rhythm_heaven/general/Hoop Trundling.mp3'),
-                       'sound' : load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/general/sound.ogg')
+        self.audio = { 'music' : load_music_stream('/hoop_trundling/Hoop Trundling.mp3'),
+                       'sound' : load_sound('/hoop_trundling/sound.ogg')
                        }
 
     def update(self):
@@ -51,7 +80,12 @@ class Game:
 
             if self.current_beat != self.previous_beat: # whenever a new beat is reached
                 play_sound(self.sound)
+                self.map_index += 1
                 print(self.current_beat)
+
+                if self.level_map[self.map_index]:
+                    pass
+
 
             self.update()
             self.draw()
