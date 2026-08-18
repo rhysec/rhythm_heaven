@@ -72,29 +72,24 @@ class Game:
 
     # 3D camera
         self.camera = Camera3D()
-        self.camera.position = Vector3(2,1,6)
-        self.camera.target = Vector3(-4,2,0)
+        self.camera.position = Vector3(6,1,6)
+        self.camera.target = Vector3(-2,2,0)
         self.camera.up = Vector3(0,1,0)
-        self.camera.fovy = 45.0
+        self.camera.fovy = 30.0
         self.camera.projection = rl.CAMERA_PERSPECTIVE
 
+
     # test objects
-        self.mesh_sphere = gen_mesh_sphere(1,100,100)
-        self.model_sphere = load_model_from_mesh(self.mesh_sphere)
-        gradient_image_sphere = gen_image_gradient_linear(256,256,90,RED,WHITE)
-        texture_sphere = load_texture_from_image(gradient_image_sphere)
-        self.model_sphere.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = texture_sphere
+        self.object_offset = 5
+        hoop_texture = self.assets['hoop']
+        self.rotation = 0
+        set_texture_filter(self.assets['hoop'], rl.TEXTURE_FILTER_BILINEAR)
 
-        self.object_offset = 0
-
-        self.mesh_cylinder = gen_mesh_cylinder(2, 0.001, 100)
-        self.model_cylinder = load_model_from_mesh(self.mesh_cylinder)
-        gradient_image_cylinder = gen_image_gradient_linear(256, 256, 90, RED, WHITE)
-        texture_cylinder = load_texture_from_image(gradient_image_cylinder)
-        self.model_cylinder.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = texture_cylinder
+        self.poly_mesh = gen_mesh_plane(2.5,2.5,1,1)
+        self.poly_model = load_model_from_mesh(self.poly_mesh)
+        self.poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = hoop_texture
 
 
-        self.model_cylinder.transform = matrix_rotate_z(1.5708)
 
 
 
@@ -104,10 +99,26 @@ class Game:
         begin_mode_3d(self.camera)
         draw_grid(100,1)
 
-        draw_model(self.model_sphere, Vector3(math.sin(self.object_offset), 0, math.sin(self.object_offset / 2)), 1, WHITE)
-        draw_model(self.model_cylinder, Vector3(self.object_offset, 2.2, 0), 1, WHITE)
+        draw_model(self.poly_model,Vector3(self.object_offset,1.2,0),1,WHITE)
+        self.poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation,0,3*math.pi/2))
+
+        draw_point_3d(Vector3(0,0,0),BLACK)
 
         end_mode_3d()
+
+        # Axis labels
+        axis_length = 5
+        x_label_pos = get_world_to_screen(Vector3(axis_length + 0.5, 0.0, 0.0), self.camera)
+        y_label_pos = get_world_to_screen(Vector3(0.0, axis_length + 0.5, 0.0), self.camera)
+        z_label_pos = get_world_to_screen(Vector3(0.0, 0.0, axis_length + 0.5), self.camera)
+        font_size = 20
+        draw_text("X", int(x_label_pos.x), int(x_label_pos.y), font_size, RED)
+        draw_text("Y", int(y_label_pos.x), int(y_label_pos.y), font_size, GREEN)
+        draw_text("Z", int(z_label_pos.x), int(z_label_pos.y), font_size, BLUE)
+
+
+
+
         end_drawing()
 
 
@@ -115,6 +126,7 @@ class Game:
 
     def import_assets(self):
         self.assets = { 'icon' : load_image('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/assets/icon.png'),
+                        'hoop' : load_texture('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/assets/hoop.png')
                         }
 
         self.audio = { 'music' : load_music_stream('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/Hoop Trundling.mp3'),
@@ -126,6 +138,8 @@ class Game:
                        'pu': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/pu.ogg'),
                        'hop': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/hop.ogg'),
                        }
+
+
 
     def update(self):
         pass
@@ -161,10 +175,15 @@ class Game:
 
                 self.map_index += 1
 
+            if is_key_pressed(rl.KEY_SPACE):
+                self.object_offset = 5
+
+
+            #update_camera(self.camera,rl.CAMERA_FREE)
 
             # Test
-            self.object_offset -= 0.1
-
+            self.object_offset -= 0.15
+            self.rotation += 0.05
 
 
             self.update()
