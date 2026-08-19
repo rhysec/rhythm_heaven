@@ -77,9 +77,16 @@ class Game:
         self.camera.fovy = 25.0
         self.camera.projection = rl.CAMERA_PERSPECTIVE
 
-
     # hoop variables
         self.hoop_list = []
+
+    # initialise trundlorbs
+        self.trundlorb_list = []
+
+        trundlorb_1 = Trundlorb(self.assets['trundlorb'],Vector3(0,1,0),1.25,5.6,self.camera)
+        self.trundlorb_list.append(trundlorb_1)
+
+
 
     def draw(self):
         begin_drawing()
@@ -91,12 +98,16 @@ class Game:
         begin_mode_3d(self.camera)
         #draw_grid(20,1)
 
+        # Draw floor
+        draw_plane(Vector3(-5, 0, 0), Vector2(20, 4), BLACK)
+
+        # Draw trundlorbs
+        for trundlorb in self.trundlorb_list:
+            trundlorb.draw()
+
         # Draw hoop
         for hoop in self.hoop_list:
             hoop.draw()
-
-        # Draw floor
-        #draw_plane(Vector3(-5,0,0),Vector2(20,4),BLACK)
 
         end_mode_3d()
 
@@ -133,10 +144,12 @@ class Game:
                        'po': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/po.ogg'),
                        'pu': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/pu.ogg'),
                        'hop': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/hop.ogg'),
+                       'pass': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/hoopPass.ogg')
                        }
 
     def spawn_hoop(self):
-        hoop = Hoop(self.assets['hoop'],Vector3(5,1.3,0),1,0)
+        hoop = Hoop(self.assets['hoop'],Vector3(5,1.3,0),1,0,self.camera)
+        play_sound(self.audio['pass'])
         self.hoop_list.append(hoop)
 
     def remove_hoops(self):
@@ -146,6 +159,9 @@ class Game:
         for hoop in self.hoop_list:
             hoop.update()
         self.remove_hoops()
+
+        for trundlorb in self.trundlorb_list:
+            trundlorb.update()
 
     def run(self):
         while not window_should_close():

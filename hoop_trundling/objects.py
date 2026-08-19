@@ -2,39 +2,48 @@ import raylib as rl
 from pyray import *
 import math
 
-class Sprite:
-    def __init__(self, texture, pos, scale):
+class Hoop:
+    def __init__(self, texture, pos, scale, rotation, camera):
         self.texture = texture
         self.pos = pos
         self.scale = scale
-
-    def draw(self):
-        draw_texture_ex(self.texture, self.pos, 0, self.scale, WHITE)
-
-
-class Hoop(Sprite):
-    def __init__(self, texture, pos, scale, rotation):
-        super().__init__(texture, pos, scale)
         self.rotation = rotation
+        self.camera = camera
+
         self.alpha = 255
-        self.hoop_texture = load_texture_from_image(self.texture)
+        self.texture = load_texture_from_image(self.texture)
         self.poly_mesh = gen_mesh_plane(2.5, 2.5, 1, 1)
         self.poly_model = load_model_from_mesh(self.poly_mesh)
-        self.poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = self.hoop_texture
+        self.poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = self.texture
 
     def draw(self):
         self.poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation, 0, 3 * math.pi / 2))
         draw_model(self.poly_model, self.pos, self.scale, Color(255,255,255,self.alpha))
 
     def update(self):
-        self.pos.x -= 0.15
+        self.pos.x -= 0.1
         self.rotation -= 0.01
 
         if self.pos.x < -15 and self.alpha > 10:
             self.alpha -= 10
 
-class Trundlorb(Sprite):
-    def __init__(self, texture, pos, scale):
-        super().__init__(texture, pos, scale)
+class Trundlorb:
+    def __init__(self, texture, pos, scale, rotation, camera):
+        self.texture = texture
+        self.pos = pos
+        self.scale = scale
+        self.rotation = rotation
+        self.camera = camera
+
+        self.trundlorb_texture = load_texture_from_image(self.texture)
+        self.poly_mesh = gen_mesh_plane(1, 1, 1, 1)
+        self.poly_model = load_model_from_mesh(self.poly_mesh)
+        self.poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = self.trundlorb_texture
+
+    def draw(self):
+        #self.poly_model.transform = matrix_rotate_xyz(Vector3(0, self.rotation, 3 * math.pi / 2))
+        #draw_model(self.poly_model, self.pos, self.scale, WHITE)
+        draw_billboard(self.camera,self.trundlorb_texture,self.pos,self.scale,WHITE)
+
     def update(self):
         pass
