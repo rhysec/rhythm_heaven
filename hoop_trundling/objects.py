@@ -15,20 +15,23 @@ class Sprite:
 class Hoop(Sprite):
     def __init__(self, texture, pos, scale, rotation):
         super().__init__(texture, pos, scale)
-        self.rotation = 0
+        self.rotation = rotation
+        self.alpha = 255
+        self.hoop_texture = load_texture_from_image(self.texture)
+        self.poly_mesh = gen_mesh_plane(2.5, 2.5, 1, 1)
+        self.poly_model = load_model_from_mesh(self.poly_mesh)
+        self.poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = self.hoop_texture
 
     def draw(self):
-        hoop_texture = load_texture_from_image(self.texture)
-        poly_mesh = gen_mesh_plane(2.5, 2.5, 1, 1)
-        poly_model = load_model_from_mesh(poly_mesh)
-        poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = hoop_texture
-
-        poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation, 0, 3 * math.pi / 2))
-        draw_model(poly_model, self.pos, self.scale, WHITE)
+        self.poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation, 0, 3 * math.pi / 2))
+        draw_model(self.poly_model, self.pos, self.scale, Color(255,255,255,self.alpha))
 
     def update(self):
         self.pos.x -= 0.15
         self.rotation -= 0.01
+
+        if self.pos.x < -15 and self.alpha > 10:
+            self.alpha -= 10
 
 class Trundlorb(Sprite):
     def __init__(self, texture, pos, scale):

@@ -1,5 +1,3 @@
-import raylib as rl
-from pyray import *
 from objects import *
 import math
 
@@ -83,22 +81,6 @@ class Game:
     # hoop variables
         self.hoop_list = []
 
-
-    # test objects
-        self.object_offset = 5
-        self.rotation = 0
-        hoop_image = self.assets['hoop']
-        #image_color_replace(hoop_image,Color(24,25,27,0),BLANK)
-        hoop_texture = load_texture_from_image(hoop_image)
-
-        self.poly_mesh = gen_mesh_plane(2.5,2.5,1,1)
-        self.poly_model = load_model_from_mesh(self.poly_mesh)
-        self.poly_model.materials[0].maps[rl.MATERIAL_MAP_ALBEDO].texture = hoop_texture
-
-
-
-
-
     def draw(self):
         begin_drawing()
         clear_background(RAYWHITE)
@@ -106,19 +88,15 @@ class Game:
         # Background gradient
         draw_rectangle_gradient_v(0,0,1280,720,Color(160,241,202,200),Color(92,142,114,200))
 
-
         begin_mode_3d(self.camera)
-        draw_grid(20,1)
+        #draw_grid(20,1)
 
         # Draw hoop
-        #draw_model(self.poly_model,Vector3(self.object_offset,1.3,0),1,WHITE)
-        #self.poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation,0,3*math.pi/2))
-
         for hoop in self.hoop_list:
             hoop.draw()
 
         # Draw floor
-        draw_plane(Vector3(-5,0,0),Vector2(20,4),BLACK)
+        #draw_plane(Vector3(-5,0,0),Vector2(20,4),BLACK)
 
         end_mode_3d()
 
@@ -205,7 +183,6 @@ class Game:
 
 
             #update_camera(self.camera,rl.CAMERA_FREE)
-
 
 
             self.update()
