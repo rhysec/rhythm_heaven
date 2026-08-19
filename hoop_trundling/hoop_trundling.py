@@ -1,5 +1,6 @@
 import raylib as rl
 from pyray import *
+from objects import *
 import math
 
 class Game:
@@ -73,17 +74,22 @@ class Game:
     # 3D camera
         self.camera = Camera3D()
         self.camera.position = Vector3(6,1,6)
-        self.camera.target = Vector3(-2,2,0)
+        self.camera.target = Vector3(-2,1,0)
         self.camera.up = Vector3(0,1,0)
-        self.camera.fovy = 30.0
+        self.camera.fovy = 25.0
         self.camera.projection = rl.CAMERA_PERSPECTIVE
+
+
+    # hoop variables
+        self.hoop_list = []
 
 
     # test objects
         self.object_offset = 5
-        hoop_texture = self.assets['hoop']
         self.rotation = 0
-        set_texture_filter(self.assets['hoop'], rl.TEXTURE_FILTER_BILINEAR)
+        hoop_image = self.assets['hoop']
+        #image_color_replace(hoop_image,Color(24,25,27,0),BLANK)
+        hoop_texture = load_texture_from_image(hoop_image)
 
         self.poly_mesh = gen_mesh_plane(2.5,2.5,1,1)
         self.poly_model = load_model_from_mesh(self.poly_mesh)
@@ -96,13 +102,23 @@ class Game:
     def draw(self):
         begin_drawing()
         clear_background(RAYWHITE)
+
+        # Background gradient
+        draw_rectangle_gradient_v(0,0,1280,720,Color(160,241,202,200),Color(92,142,114,200))
+
+
         begin_mode_3d(self.camera)
-        draw_grid(100,1)
+        draw_grid(20,1)
 
-        draw_model(self.poly_model,Vector3(self.object_offset,1.2,0),1,WHITE)
-        self.poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation,0,3*math.pi/2))
+        # Draw hoop
+        #draw_model(self.poly_model,Vector3(self.object_offset,1.3,0),1,WHITE)
+        #self.poly_model.transform = matrix_rotate_xyz(Vector3(self.rotation,0,3*math.pi/2))
 
-        draw_point_3d(Vector3(0,0,0),BLACK)
+        for hoop in self.hoop_list:
+            hoop.draw()
+
+        # Draw floor
+        draw_plane(Vector3(-5,0,0),Vector2(20,4),BLACK)
 
         end_mode_3d()
 
@@ -116,17 +132,19 @@ class Game:
         draw_text("Y", int(y_label_pos.x), int(y_label_pos.y), font_size, GREEN)
         draw_text("Z", int(z_label_pos.x), int(z_label_pos.y), font_size, BLUE)
 
-
+        draw_text("                 X    Y    Z", 1000, 0,
+                  font_size, RED)
+        draw_text(f"Camera pos  {round(self.camera.position.x)}, {round(self.camera.position.y)}, {round(self.camera.position.z)}", 1000,20,font_size, RED)
+        draw_text(f"Camera tar {round(self.camera.target.x)}, {round(self.camera.target.y)}, {round(self.camera.target.z)}", 1000, 40,
+                  font_size, RED)
 
 
         end_drawing()
 
-
-
-
     def import_assets(self):
         self.assets = { 'icon' : load_image('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/assets/icon.png'),
-                        'hoop' : load_texture('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/assets/hoop.png')
+                        'hoop' : load_image('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/assets/hoop.png'),
+                        'trundlorb' : load_image('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/assets/trundlorb.png')
                         }
 
         self.audio = { 'music' : load_music_stream('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/Hoop Trundling.mp3'),
@@ -139,10 +157,17 @@ class Game:
                        'hop': load_sound('C:/Users/rhyse/PycharmProjects/rhythm_heaven/hoop_trundling/audio/hop.ogg'),
                        }
 
+    def spawn_hoop(self):
+        hoop = Hoop(self.assets['hoop'],Vector3(5,1.3,0),1,0)
+        self.hoop_list.append(hoop)
 
+    def remove_hoops(self):
+        self.hoop_list = [hoop for hoop in self.hoop_list if hoop.pos.x > -20]
 
     def update(self):
-        pass
+        for hoop in self.hoop_list:
+            hoop.update()
+        self.remove_hoops()
 
     def run(self):
         while not window_should_close():
@@ -175,15 +200,12 @@ class Game:
 
                 self.map_index += 1
 
-            if is_key_pressed(rl.KEY_SPACE):
-                self.object_offset = 5
+            if is_key_pressed(rl.KEY_ONE):
+                self.spawn_hoop()
 
 
             #update_camera(self.camera,rl.CAMERA_FREE)
 
-            # Test
-            self.object_offset -= 0.15
-            self.rotation += 0.05
 
 
             self.update()
